@@ -1,0 +1,1 @@
+python train_text_diffusion.py --eval --resume_dir saved_models/e2e/2023-07-08_15-12-36 --sampling_timesteps 250 --num_samples 1000 --ddim_sampling_eta 1
