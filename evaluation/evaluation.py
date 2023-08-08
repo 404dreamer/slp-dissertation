@@ -9,22 +9,21 @@ import numpy as np
 import wandb
 
 
-def compute_perplexity(all_texts_list, model_id='./pre_trained_models/gpt2-large'):
-    torch.cuda.empty_cache() 
-    # perplexity = load("./offline_metrics/perplexity.py", module_type="metric")
-    perplexity = load("./offline_metrics/perplexity.py")
-    # results = perplexity.compute(predictions=all_texts_list, model_id=model_id, device='cuda')
-    results = perplexity.compute(data=all_texts_list, model_id=model_id, device='cuda')
+def compute_perplexity(all_texts_list, model_id='gpt2-large'):
+    torch.cuda.empty_cache()
+    perplexity = load("perplexity", module_type="metric")
+    results = perplexity.compute(predictions=all_texts_list, model_id=model_id, device='cuda')
     return results['mean_perplexity']
 
+
 def compute_wordcount(all_texts_list):
-    # problem when loading word_count offline
-    wordcount = load("./offline_metrics/word_count.py")
+    wordcount = load("word_count")
     wordcount = wordcount.compute(data=all_texts_list)
     return wordcount['unique_words']
 
+
 def compute_diversity(all_texts_list):
-    ngram_range = [2,3,4]
+    ngram_range = [2, 3, 4]
 
     tokenizer = spacy.load("en_core_web_sm").tokenizer
     token_list = []
@@ -39,15 +38,15 @@ def compute_diversity(all_texts_list):
         for tokens in token_list:
             ngram_sets[n].update(ngrams(tokens, n))
             ngram_counts[n] += len(list(ngrams(tokens, n)))
-        metrics[f'{n}gram_repitition'] = (1-len(ngram_sets[n])/ngram_counts[n])
+        metrics[f'{n}gram_repitition'] = (1 - len(ngram_sets[n]) / ngram_counts[n])
     diversity = 1
     for val in metrics.values():
-        diversity *= (1-val)
+        diversity *= (1 - val)
     metrics['diversity'] = diversity
     return metrics
 
-def compute_memorization(all_texts_list, human_references, n=4):
 
+def compute_memorization(all_texts_list, human_references, n=4):
     tokenizer = spacy.load("en_core_web_sm").tokenizer
     unique_four_grams = set()
     for sentence in human_references:
@@ -62,25 +61,28 @@ def compute_memorization(all_texts_list, human_references, n=4):
             if four_gram in unique_four_grams:
                 duplicate += 1
 
-    return duplicate/total
+    return duplicate / total
+
 
 def compute_mauve(all_texts_list, human_references, model_id):
-    torch.cuda.empty_cache() 
-    assert model_id in {'./pre_trained_models/gpt2-large', 'all-mpnet-base-v2'}
-    mauve = load("./offline_metrics/mauve.py")
+    torch.cuda.empty_cache()
+    assert model_id in {'gpt2-large', 'all-mpnet-base-v2'}
+    mauve = load("mauve")
     assert len(all_texts_list) == len(human_references)
 
     if model_id == 'all-mpnet-base-v2':
         model = SentenceTransformer(model_id).cuda()
-        #Sentences are encoded by calling model.encode()
+        # Sentences are encoded by calling model.encode()
         all_texts_list_embedding = model.encode(all_texts_list)
         human_references_embedding = model.encode(human_references)
-        results = mauve.compute(predictions=all_texts_list, p_features=all_texts_list_embedding, references=human_references, q_features=human_references_embedding, featurize_model_name=model_id, max_text_length=256, device_id=0, mauve_scaling_factor=8,)
-    elif model_id == './pre_trained_models/gpt2-large':
-        results = mauve.compute(predictions=all_texts_list, references=human_references, featurize_model_name=model_id, max_text_length=256, device_id=0)
+        results = mauve.compute(predictions=all_texts_list, p_features=all_texts_list_embedding,
+                                references=human_references, q_features=human_references_embedding,
+                                featurize_model_name=model_id, max_text_length=256, device_id=0,
+                                mauve_scaling_factor=8, )
+    elif model_id == 'gpt2-large':
+        results = mauve.compute(predictions=all_texts_list, references=human_references, featurize_model_name=model_id,
+                                max_text_length=256, device_id=0)
     else:
         raise NotImplementedError
-    
-    return results.mauve, results.divergence_curve
 
-    
+    return results.mauve, results.divergence_curve

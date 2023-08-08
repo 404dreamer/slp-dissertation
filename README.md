@@ -1,6 +1,6 @@
-# Offline Implementation for Efficient Training of Diffusion Language Models
+# Online Implementation for Efficient Training of Diffusion Language Models
 
-This code is based on the implementation of: [**Latent Diffusion for Language Generation**](https://arxiv.org/abs/2212.09462). Since the computing platform we relied on is Cirrus, where the computing nodes are offline; Hence, many modifications are required to convert the code for online enviriment to an offline environment. 
+This code is based on the implementation of: [**Latent Diffusion for Language Generation**](https://arxiv.org/abs/2212.09462). 
 
 
 ## Training Track
@@ -14,36 +14,6 @@ A suitable environment can be created with the following commands.
 conda env create -f environment.yml
 python -m spacy download en_core_web_sm
 ```
-
-If you are using an offline computing environment, please first cache the BART model to the default path (usually /home/.cache). Open 'python' or 'ipython' in terminal:
-```python
-
-from transformers AutoTokenizer
-from transformers.models.bart.modeling_bart import BartForConditionalGeneration
-
-bart_model = BartForConditionalGeneration.from_pretrained("facebook/bart-base") # bart model
-tokenizer = AutoTokenizer.from_pretrained("facebook/bart-base") # bart tokenizaer
-
-```
-Then, by using 'python' or 'ipython' (in an online environment), cache 'gpt2-large' to the folder `pre_trained_model`.
-```python
-# cache gpt2-large
-from transformers import GPT2Tokenizer, GPT2Model
-
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2-large')
-tokenizer.save_pretrained("./pre_trained_models/gpt2-large")
-model = GPT2Model.from_pretrained('gpt2-large')
-model.save_pretrained("./pre_trained_models/gpt2-large")
-
-```
-
-Cache 'all-mpnet-base-v2' to the default path (usually /home/.cache) by using 'python' or 'ipython' (in an online environment).
-```python
-from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('all-mpnet-base-v2')
-
-```
-The required metrics are already set up in the folder `offline_metrics`
 
 ## Datasets
 

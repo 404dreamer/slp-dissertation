@@ -631,7 +631,7 @@ class Trainer(object):
             train_subset2 = self.dataset['train']['text'][self.num_samples:(2*self.num_samples)] 
             test_subset = self.dataset['test']['text'][:self.num_samples]
             self.reference_dict['reference/test_perplexity'] = evaluation.compute_perplexity(test_subset)
-            for mauve_model_id in ["./pre_trained_models/gpt2-large", "all-mpnet-base-v2"]:
+            for mauve_model_id in ["gpt2-large", "all-mpnet-base-v2"]:
                 self.reference_dict[f'reference/{mauve_model_id}_train_test_mauve'], _ = evaluation.compute_mauve(train_subset, test_subset, mauve_model_id)
                 self.reference_dict[f'reference/{mauve_model_id}_train_train_mauve'], _ = evaluation.compute_mauve(train_subset, train_subset2, mauve_model_id)
                 ngram_metrics = evaluation.compute_diversity(test_subset)
@@ -646,7 +646,7 @@ class Trainer(object):
         train_subset2 = self.dataset['train']['text'][self.num_samples:(2*self.num_samples)] 
         self.reference_dict['reference/train_perplexity'] = evaluation.compute_perplexity(train_subset)
         self.reference_dict['reference/val_perplexity'] = evaluation.compute_perplexity(val_subset)
-        for mauve_model_id in ["./pre_trained_models/gpt2-large", "all-mpnet-base-v2"]:
+        for mauve_model_id in ["gpt2-large", "all-mpnet-base-v2"]:
             self.reference_dict[f'reference/{mauve_model_id}_train_val_mauve'], _ = evaluation.compute_mauve(train_subset, val_subset, mauve_model_id)
             self.reference_dict[f'reference/{mauve_model_id}_train_train_mauve'], _ = evaluation.compute_mauve(train_subset, train_subset2, mauve_model_id)
         ngram_metrics = evaluation.compute_diversity(val_subset)
@@ -794,7 +794,7 @@ class Trainer(object):
             if metrics[f"model/{strategy}/{class_id_prefix}perplexity"] > 5000:
                 continue
 
-            for mauve_model_id in ["./pre_trained_models/gpt2-large", "all-mpnet-base-v2"]:
+            for mauve_model_id in ["gpt2-large", "all-mpnet-base-v2"]:
                 for key, reference_text in reference_texts.items():
                     metrics[f"model/{strategy}/{mauve_model_id}_{class_id_prefix}{key}_mauve"], _ = evaluation.compute_mauve(all_texts_list, reference_text, mauve_model_id)
 
