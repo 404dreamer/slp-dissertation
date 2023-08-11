@@ -1,6 +1,4 @@
 from diffusion.lion import *
-from diffusion.sophia import *
-
 from torch.optim import AdamW
 
 def separate_weight_decayable_params(params):
